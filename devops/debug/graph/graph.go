@@ -61,3 +61,51 @@ func RegisterSimpleGraph(ctx context.Context) {
 
 	logs.Infof("eino simple graph output is: %v", message)
 }
+
+type NodeInfo struct {
+	Message string
+}
+
+func RegisterGraphOfInterfaceType(ctx context.Context) {
+	g := compose.NewGraph[any, string]()
+
+	_ = g.AddLambdaNode("node_1", compose.InvokableLambda(func(ctx context.Context, input *NodeInfo) (output string, err error) {
+		if input == nil {
+			return "", nil
+		}
+		return input.Message + " process by node_1,", nil
+	}))
+
+	_ = g.AddLambdaNode("node_2", compose.InvokableLambda(func(ctx context.Context, input string) (output string, err error) {
+		return input + " process by node_2,", nil
+	}))
+
+	_ = g.AddLambdaNode("node_3", compose.InvokableLambda(func(ctx context.Context, input string) (output string, err error) {
+		return input + " process by node_3,", nil
+	}))
+
+	_ = g.AddEdge(compose.START, "node_1")
+
+	_ = g.AddEdge("node_1", "node_2")
+
+	_ = g.AddEdge("node_2", "node_3")
+
+	_ = g.AddEdge("node_3", compose.END)
+
+	r, err := g.Compile(ctx)
+	if err != nil {
+		logs.Errorf("compile graph failed, err=%v", err)
+		return
+	}
+
+	message, err := r.Invoke(ctx, &NodeInfo{
+		Message: "test data",
+	})
+
+	if err != nil {
+		logs.Errorf("invoke graph failed, err=%v", err)
+		return
+	}
+
+	logs.Infof("eino simple graph output is: %v", message)
+}
