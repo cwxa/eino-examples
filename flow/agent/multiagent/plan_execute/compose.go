@@ -247,7 +247,7 @@ func genToolInfos(ctx context.Context, config compose.ToolsNodeConfig) ([]*schem
 
 func convertMessagesForDeepSeek(messages []*schema.Message) (converted []*schema.Message) {
 	converted = make([]*schema.Message, 0, len(messages)*2)
-	for _, message := range messages {
+	for i, message := range messages {
 		if message.Role == schema.Tool { // 有 DeepSeek 服务商如火山引擎，目前不支持传入 ToolMessage
 			converted = append(converted, schema.UserMessage(""))
 			converted = append(converted, schema.AssistantMessage(message.Content, nil))
@@ -260,6 +260,10 @@ func convertMessagesForDeepSeek(messages []*schema.Message) (converted []*schema
 					content += fmt.Sprintf(" call %s with %s. ", toolCall.Function.Name, toolCall.Function.Arguments)
 				}
 				converted = append(converted, schema.AssistantMessage(content, nil))
+			}
+
+			if i < len(messages)-1 && messages[i+1].Role == schema.Assistant {
+				converted = append(converted, schema.UserMessage(""))
 			}
 		} else {
 			converted = append(converted, message)

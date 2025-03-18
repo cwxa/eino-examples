@@ -32,6 +32,10 @@ func Test_convertMessagesForDeepSeek(t *testing.T) {
 			},
 		},
 		{
+			Role:    schema.Assistant,
+			Content: "",
+		},
+		{
 			Role:    schema.Tool,
 			Content: "tool content",
 		},
@@ -42,6 +46,14 @@ func Test_convertMessagesForDeepSeek(t *testing.T) {
 		{
 			Role:    schema.Assistant,
 			Content: "try this. call func1 with arguments1.  call func2 with arguments2. ",
+		},
+		{
+			Role:    schema.User,
+			Content: "",
+		},
+		{
+			Role:    schema.Assistant,
+			Content: "",
 		},
 		{
 			Role:    schema.User,
