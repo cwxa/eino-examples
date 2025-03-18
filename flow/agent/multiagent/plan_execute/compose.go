@@ -249,21 +249,25 @@ func convertMessagesForDeepSeek(messages []*schema.Message) (converted []*schema
 	converted = make([]*schema.Message, 0, len(messages)*2)
 	for _, message := range messages {
 		if message.Role == schema.Tool { // 有 DeepSeek 服务商如火山引擎，目前不支持传入 ToolMessage
+			converted = append(converted, schema.UserMessage(""))
 			converted = append(converted, schema.AssistantMessage(message.Content, nil))
 		} else if message.Role == schema.Assistant {
 			if len(message.ToolCalls) == 0 {
 				converted = append(converted, message)
 			} else {
-				if len(message.Content) > 0 {
-					converted = append(converted, schema.AssistantMessage(message.Content, nil))
-				}
+				content := message.Content
 				for _, toolCall := range message.ToolCalls {
-					converted = append(converted, schema.AssistantMessage(fmt.Sprintf("call %s with %s, got response:", toolCall.Function.Name, toolCall.Function.Arguments), nil))
+					content += fmt.Sprintf(" call %s with %s. ", toolCall.Function.Name, toolCall.Function.Arguments)
 				}
+				converted = append(converted, schema.AssistantMessage(content, nil))
 			}
 		} else {
 			converted = append(converted, message)
 		}
+	}
+
+	if converted[len(converted)-1].Role == schema.Assistant {
+		converted = append(converted, schema.UserMessage(""))
 	}
 
 	return converted
