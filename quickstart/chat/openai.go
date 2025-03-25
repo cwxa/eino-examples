@@ -23,8 +23,15 @@ import (
 
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/components/model"
+	"github.com/joho/godotenv"
 )
 
+func init() {
+	err := godotenv.Load("C:/Users/16083/project/eino-examples/.env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+}
 func createOpenAIChatModel(ctx context.Context) model.ChatModel {
 	key := os.Getenv("OPENAI_API_KEY")
 	modelName := os.Getenv("OPENAI_MODEL_NAME")
