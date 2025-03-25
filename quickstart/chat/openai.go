@@ -27,7 +27,7 @@ import (
 )
 
 func init() {
-	err := godotenv.Load("C:/Users/16083/project/eino-examples/.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
